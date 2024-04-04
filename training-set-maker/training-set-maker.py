@@ -1,40 +1,45 @@
 import cv2
+import pygame
 import numpy as np
-from pyray import *
 
-webcam_dimension = 24
-
-def resize_frame(frame, width, height):
-    return cv2.resize(frame, (width, height))
-
-def convert_to_grayscale(frame):
-    return cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+downsized_dimension = 24 # Make this as small as possible for better training
 
 def main():
-    set_config_flags(ConfigFlags.FLAG_VSYNC_HINT)
-    init_window(800, 600, "Webcam Feed")
-
-    # Open the webcam
+    # Create a VideoCapture object to capture the webcam feed
     cap = cv2.VideoCapture(0)
 
-    while not window_should_close():
-        # Capture webcam frame
+    # Initialize Pygame and the display window
+    pygame.init()
+    screen = pygame.display.set_mode((800, 600))
+    pygame.display.set_caption("Webcam Feed")
+
+    running = True
+    while running:
+        # Read the current frame from the webcam
         ret, frame = cap.read()
-        # less pixels for less features
-        resized_frame = resize_frame(frame, webcam_dimension, webcam_dimension)
-        # Convert frame to grayscale
-        grayscale_frame = convert_to_grayscale(resized_frame)
 
-        begin_drawing()
-        clear_background(WHITE)
-        # Draw the frame
-        draw_texture(load_texture_from_image(grayscale_frame), 0, 0, WHITE)
+        # Resize the frame to training size
+        resized_frame = cv2.resize(frame, (downsized_dimension, downsized_dimension))
+        training_frame = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2GRAY)
 
-        end_drawing()
+        # Convert grayscale frame to RGB again for Pygame
+        rgb_frame = cv2.cvtColor(training_frame, cv2.COLOR_GRAY2RGB)
+        pygame_frame = pygame.image.frombuffer(rgb_frame.tostring(), rgb_frame.shape[1::-1], "RGB")
+        #pygame_frame = pygame.transform.rotate(pygame_frame, -90)
+        pygame_frame = pygame.transform.scale(pygame_frame, (300, 300))
 
-    close_window()
-    # Release the webcam
+        # Draw the frame to the Pygame window
+        screen.blit(pygame_frame, (0, 0))
+        pygame.display.flip()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+    # Close
+    print("Closing")
     cap.release()
+    cv2.destroyAllWindows()
+    pygame.quit()
 
 if __name__ == "__main__":
     main()
