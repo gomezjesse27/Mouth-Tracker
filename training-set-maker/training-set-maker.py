@@ -7,10 +7,20 @@ import csv
 training_set_name = 'training_set.csv'
 downsized_dimension = 24 # Make this as small as possible for better training
 
-target_value = 0
+def save_datapoint(frame, target_value):
+    # Save a datapoint to the CSV file
+    normalized_training_frame = np.round(frame / 255.0, 3)
+    datapoint = list(normalized_training_frame.flatten())
+    datapoint.append(target_value)
+    with open(training_set_name, 'a', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(datapoint)
 
 def main():
-    global target_value
+    target_value = 0
+    calibrating = False
+    calibration_start_time = 0
+    calibration_length_ms = 5000
 
     # Create a VideoCapture object to capture the webcam feed
     cap = cv2.VideoCapture(0)
@@ -29,6 +39,7 @@ def main():
         writer = csv.writer(f)
         writer.writerow(header)
 
+    clock = pygame.time.Clock()
     running = True
     while running:
         # Read the current frame from the webcam
@@ -57,17 +68,18 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_r:
-                    # Randomize the target value
-                    target_value = random.random()
-                elif event.key == pygame.K_p:
-                    # Save a datapoint to the CSV file
-                    normalized_training_frame = np.round(training_frame / 255.0, 3)
-                    datapoint = list(normalized_training_frame.flatten())
-                    datapoint.append(target_value)
-                    with open(training_set_name, 'a', newline='') as f:
-                        writer = csv.writer(f)
-                        writer.writerow(datapoint)
+                if event.key == pygame.K_SPACE:
+                    calibrating = True
+                    calibration_start_time = pygame.time.get_ticks()
+        
+        if calibrating and pygame.time.get_ticks() - calibration_start_time > calibration_length_ms:
+            calibrating = False
+        
+        if calibrating:
+            target_value = (pygame.time.get_ticks() - calibration_start_time) / calibration_length_ms
+            save_datapoint(training_frame, target_value)
+        
+        clock.tick(30)
 
     # Close
     print("Closing")
