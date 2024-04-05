@@ -6,7 +6,7 @@ import numpy as np
 import joblib
 
 # Load the training data
-data = pd.read_csv('training_set.csv')
+data = pd.read_csv('./training_set.csv')
 
 print(data.head())
 

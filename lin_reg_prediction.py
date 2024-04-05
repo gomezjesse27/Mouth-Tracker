@@ -63,7 +63,8 @@ def main():
                 running = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    predicted_target_value = predict_target(datapoint_frame)
+                    print("how are you")
+        predicted_target_value = predict_target(datapoint_frame)
 
         clock.tick(30)
 

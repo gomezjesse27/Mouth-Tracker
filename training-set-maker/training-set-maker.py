@@ -73,6 +73,8 @@ def main():
                 if event.key == pygame.K_SPACE:
                     calibrating = True
                     calibration_start_time = pygame.time.get_ticks()
+                elif event.key == pygame.K_n: # N for "Next". Quits it.
+                    running = False
         
         if calibrating and pygame.time.get_ticks() - calibration_start_time > calibration_length_ms:
             calibrating = False
