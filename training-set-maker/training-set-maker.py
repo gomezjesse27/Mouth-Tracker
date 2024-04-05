@@ -60,7 +60,9 @@ def main():
 
         # Render the target value as text and draw it to the Pygame window
         target_text = font.render(f'Target: {target_value}', True, (255, 255, 255))
+        calibrating_text = font.render(f'Calibrating: {calibrating}', True, (255, 255, 255))
         screen.blit(target_text, (350, 10))
+        screen.blit(calibrating_text, (350, 50))
 
         pygame.display.flip()
 
