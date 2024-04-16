@@ -7,20 +7,20 @@ import csv
 training_set_name = 'training_set.csv'
 downsized_dimension = 24 # Make this as small as possible for better training
 
-def save_datapoint(frame, target_value):
+def save_datapoint(frame, target_values):
     # Save a datapoint to the CSV file
     normalized_training_frame = np.round(frame / 255.0, 3)
     datapoint = list(normalized_training_frame.flatten())
-    datapoint.append(target_value)
+    for value in target_values:
+        datapoint.append(value)
     with open(training_set_name, 'a', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(datapoint)
 
 def main():
-    target_value = 0
+    target0_value = 0
+    target1_value = 0
     calibrating = False
-    calibration_start_time = 0
-    calibration_length_ms = 5000
 
     # Create a VideoCapture object to capture the webcam feed
     cap = cv2.VideoCapture(0)
@@ -34,7 +34,7 @@ def main():
     font = pygame.font.Font(None, 36)
 
     # Create a header for the CSV file
-    header = [f'pix{i}' for i in range(downsized_dimension * downsized_dimension)] + ['target0']
+    header = [f'pix{i}' for i in range(downsized_dimension * downsized_dimension)] + ['target0'] + ['target1']
     with open(training_set_name, 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(header)
@@ -59,9 +59,11 @@ def main():
         screen.blit(pygame_frame, (0, 0))
 
         # Render the target value as text and draw it to the Pygame window
-        target_text = font.render(f'Target: {target_value}', True, (255, 255, 255))
+        target0_text = font.render(f'Target0: {target0_value}', True, (255, 255, 255))
+        target1_text = font.render(f'Target1: {target1_value}', True, (255, 255, 255))
         calibrating_text = font.render(f'Calibrating: {calibrating}', True, (255, 255, 255))
-        screen.blit(target_text, (350, 10))
+        screen.blit(target0_text, (350, 10))
+        screen.blit(target1_text, (350, 30))
         screen.blit(calibrating_text, (350, 50))
 
         pygame.display.flip()
@@ -70,18 +72,22 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    calibrating = True
-                    calibration_start_time = pygame.time.get_ticks()
-                elif event.key == pygame.K_n: # N for "Next". Quits it.
+                if event.key == pygame.K_n: # N for "Next". Quits it.
                     running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                calibrating = True
+            elif event.type == pygame.MOUSEBUTTONUP:
+                calibrating = False
         
-        if calibrating and pygame.time.get_ticks() - calibration_start_time > calibration_length_ms:
-            calibrating = False
-        
+        # Your mouse controls the two target values. Hold click to save datapoints.
+        screen_width, screen_height = pygame.display.get_surface().get_size()
+        mouse_position = pygame.mouse.get_pos()
+        normalized_mouse_position = (mouse_position[0] / screen_width, mouse_position[1] / screen_height)
+        target0_value = normalized_mouse_position[0]
+        target1_value = normalized_mouse_position[1]
+
         if calibrating:
-            target_value = (pygame.time.get_ticks() - calibration_start_time) / calibration_length_ms
-            save_datapoint(training_frame, target_value)
+            save_datapoint(training_frame, [target0_value, target1_value])
         
         clock.tick(30)
 
