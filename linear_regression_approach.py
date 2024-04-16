@@ -2,6 +2,7 @@ import subprocess
 import os
 
 # Path to your virtual environment's Python interpreter
+# If you don't want to use a virtual environment, you can comment out this line
 venv_python_path = os.path.join(os.getcwd(), 'venv', 'Scripts', 'python')
 
 # Run training-set-maker.py
