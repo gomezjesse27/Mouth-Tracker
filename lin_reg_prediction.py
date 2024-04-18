@@ -6,7 +6,7 @@ import csv
 import joblib
 
 pca_model = joblib.load('pca_model.pkl')
-linear_regression_model = joblib.load('linear_regression_model.pkl')
+multioutput_linear_regression_model = joblib.load('multioutput_linear_regression_model.pkl')
 downsized_dimension = 24 # Make this as small as possible for better training
 
 def predict_target(frame):
@@ -14,12 +14,12 @@ def predict_target(frame):
     # Save a datapoint to the CSV file
     normalized_data_frame = np.round(frame / 255.0, 3)
     datapoint = list(normalized_data_frame.flatten())
-    prediction = linear_regression_model.predict(pca_model.transform([datapoint]))
-    print(f'Predicted target: {prediction}')
-    return prediction
+    predictions = multioutput_linear_regression_model.predict(pca_model.transform([datapoint]))[0] # idk why I have to put the [0] here but I do. then you can index predictions with [0] and [1] etc
+    print(f'Predicted target: {predictions[0]}, {predictions[1]}')
+    return predictions
 
 def main():
-    predicted_target_value = 0
+    predicted_target_values = [0, 0]
     predict = False
 
     # Create a VideoCapture object to capture the webcam feed
@@ -53,8 +53,10 @@ def main():
         screen.blit(pygame_frame, (0, 0))
 
         # Render the target value as text and draw it to the Pygame window
-        target_text = font.render(f'Prediction: {predicted_target_value}', True, (255, 255, 255))
+        target_text = font.render(f'Prediction: {predicted_target_values[0]}', True, (255, 255, 255))
         screen.blit(target_text, (350, 10))
+        target_text = font.render(f'Prediction: {predicted_target_values[1]}', True, (255, 255, 255))
+        screen.blit(target_text, (350, 30))
 
         pygame.display.flip()
 
@@ -64,7 +66,7 @@ def main():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     print("how are you")
-        predicted_target_value = predict_target(datapoint_frame)
+        predicted_target_values = predict_target(datapoint_frame)
 
         clock.tick(30)
 
