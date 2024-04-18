@@ -74,6 +74,10 @@ def main():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_n: # N for "Next". Quits it.
                     running = False
+                elif event.key == pygame.K_BACKSPACE: # Backspace for "try again". Clears the training set.
+                    with open(training_set_name, 'w', newline='') as f:
+                        writer = csv.writer(f)
+                        writer.writerow(header)
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 calibrating = True
             elif event.type == pygame.MOUSEBUTTONUP:
