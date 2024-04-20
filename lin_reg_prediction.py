@@ -1,21 +1,22 @@
 import cv2
 import pygame
 import numpy as np
-import random
-import csv
 import joblib
+import warnings 
 
 pca_model = joblib.load('pca_model.pkl')
 multioutput_linear_regression_model = joblib.load('multioutput_linear_regression_model.pkl')
 downsized_dimension = 24 # Make this as small as possible for better training
 
 def predict_target(frame):
-    print("Predicting!")
+    #print("Predicting!")
     # Save a datapoint to the CSV file
     normalized_data_frame = np.round(frame / 255.0, 3)
     datapoint = list(normalized_data_frame.flatten())
-    predictions = multioutput_linear_regression_model.predict(pca_model.transform([datapoint]))[0] # idk why I have to put the [0] here but I do. then you can index predictions with [0] and [1] etc
-    print(f'Predicted target: {predictions[0]}, {predictions[1]}')
+    with warnings.catch_warnings(): # TODO: actually solve the warning. it's about X not having feature names even though it was trained with feature names (pix0 ... pix783)
+        warnings.filterwarnings("ignore")        
+        predictions = multioutput_linear_regression_model.predict(pca_model.transform([datapoint]))[0] # idk why I have to put the [0] here but I do. then you can index predictions with [0] and [1] etc
+    #print(f'Predicted target: {predictions[0]}, {predictions[1]}')
     return predictions
 
 def main():
@@ -45,7 +46,8 @@ def main():
 
         # Convert grayscale frame to RGB again for Pygame
         rgb_frame = cv2.cvtColor(datapoint_frame, cv2.COLOR_GRAY2RGB)
-        pygame_frame = pygame.image.frombuffer(rgb_frame.tostring(), rgb_frame.shape[1::-1], "RGB")
+        #pygame_frame = pygame.image.frombuffer(rgb_frame.tostring(), rgb_frame.shape[1::-1], "RGB")
+        pygame_frame = pygame.image.frombuffer(rgb_frame.tobytes(), rgb_frame.shape[1::-1], "RGB")
         pygame_frame = pygame.transform.scale(pygame_frame, (300, 300))
 
         screen.fill((50, 10, 0))
