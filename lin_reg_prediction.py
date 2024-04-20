@@ -55,9 +55,11 @@ def main():
         screen.blit(pygame_frame, (0, 0))
 
         # Render the target value as text and draw it to the Pygame window
-        target_text = font.render(f'Prediction: {predicted_target_values[0]}', True, (255, 255, 255))
+        pygame.draw.rect(screen, (200, 0, 255), (350, 10, int(200 * predicted_target_values[0]), 30))
+        target_text = font.render(f'Smiling: {round(predicted_target_values[0], 3)}', True, (255, 255, 255))
         screen.blit(target_text, (350, 10))
-        target_text = font.render(f'Prediction: {predicted_target_values[1]}', True, (255, 255, 255))
+        pygame.draw.rect(screen, (200, 0, 255), (350, 30, int(200 * predicted_target_values[1]), 30))        
+        target_text = font.render(f'MouthOpen: {round(predicted_target_values[1], 3)}', True, (255, 255, 255))
         screen.blit(target_text, (350, 30))
 
         pygame.display.flip()
