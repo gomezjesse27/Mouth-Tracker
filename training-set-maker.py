@@ -3,6 +3,7 @@ import pygame
 import numpy as np
 import random
 import csv
+from config import WEBCAM_ID
 
 training_set_name = 'training_set.csv'
 downsized_dimension = 24 # Make this as small as possible for better training
@@ -23,7 +24,7 @@ def main():
     calibrating = False
 
     # Create a VideoCapture object to capture the webcam feed
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(WEBCAM_ID)
 
     # Initialize Pygame and the display window
     pygame.init()

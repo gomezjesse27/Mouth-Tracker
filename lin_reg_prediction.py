@@ -3,6 +3,7 @@ import pygame
 import numpy as np
 import joblib
 import warnings 
+from config import WEBCAM_ID
 
 pca_model = joblib.load('pca_model.pkl')
 multioutput_linear_regression_model = joblib.load('multioutput_linear_regression_model.pkl')
@@ -24,7 +25,7 @@ def main():
     predict = False
 
     # Create a VideoCapture object to capture the webcam feed
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(WEBCAM_ID)
 
     # Initialize Pygame and the display window
     pygame.init()
