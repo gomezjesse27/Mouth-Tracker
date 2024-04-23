@@ -3,11 +3,11 @@ import pygame
 import numpy as np
 import joblib
 import warnings 
-from config import WEBCAM_ID
+from config import WEBCAM_ID, RESOLUTION
 
 pca_model = joblib.load('pca_model.pkl')
 multioutput_linear_regression_model = joblib.load('multioutput_linear_regression_model.pkl')
-downsized_dimension = 24 # Make this as small as possible for better training
+downsized_dimension = RESOLUTION # Make this as small as possible for better training
 
 def predict_target(frame):
     #print("Predicting!")

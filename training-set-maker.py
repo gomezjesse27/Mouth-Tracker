@@ -3,10 +3,10 @@ import pygame
 import numpy as np
 import random
 import csv
-from config import WEBCAM_ID
+from config import WEBCAM_ID, RESOLUTION
 
 training_set_name = 'training_set.csv'
-downsized_dimension = 24 # Make this as small as possible for better training
+downsized_dimension = RESOLUTION # Make this as small as possible for better training
 
 def save_datapoint(frame, target_values):
     # Save a datapoint to the CSV file
