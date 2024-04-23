@@ -7,7 +7,7 @@ venv_python_path = os.path.join(os.getcwd(), 'venv', 'Scripts', 'python')
 
 # Run training-set-maker.py
 print("Running training-set-maker.py")
-subprocess.run([venv_python_path, "./training-set-maker/training-set-maker.py"])
+subprocess.run([venv_python_path, "./training-set-maker.py"])
 
 # Run pca_and_lin_reg_modeling.py
 print("Running pca_and_lin_reg_modeling.py")
