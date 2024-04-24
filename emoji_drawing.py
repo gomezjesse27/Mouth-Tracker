@@ -55,33 +55,34 @@ def draw_emoji(x_pos, y_pos, size, morph_values):
     if len(eye_r_points) > 1:
         pygame.draw.polygon(screen, LINE_COLOR, eye_r_points, LINE_WIDTH)
 
-# Game loop
-font = pygame.font.Font(None, 36)
-running = True
-clock = pygame.time.Clock()
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+def main():
+    # Game loop
+    font = pygame.font.Font(None, 36)
+    running = True
+    clock = pygame.time.Clock()
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
 
-    # Fill the background
-    screen.fill(BACKGROUND_COLOR)
+        # Fill the background
+        screen.fill(BACKGROUND_COLOR)
 
-    mouth_open = (math.sin(pygame.time.get_ticks() * 0.002) + 1) / 2
-    smile = (math.cos(pygame.time.get_ticks() * 0.002) + 1) / 2
-    draw_emoji(200, 200, 256, [smile, mouth_open])
+        mouth_open = (math.sin(pygame.time.get_ticks() * 0.002) + 1) / 2
+        smile = (math.cos(pygame.time.get_ticks() * 0.002) + 1) / 2
+        draw_emoji(200, 200, 256, [smile, mouth_open])
 
-    pygame.draw.rect(screen, (200, 0, 255), (350, 10, int(200 * smile), 30))
-    target_text = font.render(f'Smiling: {round(smile, 3)}', True, (255, 255, 255))
-    screen.blit(target_text, (350, 10))
-    pygame.draw.rect(screen, (200, 0, 255), (350, 30, int(200 * mouth_open), 30))        
-    target_text = font.render(f'MouthOpen: {round(mouth_open, 3)}', True, (255, 255, 255))
-    screen.blit(target_text, (350, 30))
+        pygame.draw.rect(screen, (200, 0, 255), (350, 10, int(200 * smile), 30))
+        target_text = font.render(f'Smiling: {round(smile, 3)}', True, (255, 255, 255))
+        screen.blit(target_text, (350, 10))
+        pygame.draw.rect(screen, (200, 0, 255), (350, 30, int(200 * mouth_open), 30))        
+        target_text = font.render(f'MouthOpen: {round(mouth_open, 3)}', True, (255, 255, 255))
+        screen.blit(target_text, (350, 30))
 
-    # Flip the display
-    pygame.display.flip()
+        # Flip the display
+        pygame.display.flip()
 
-    clock.tick(30)
+        clock.tick(30)
 
-pygame.quit()
-sys.exit()
+    pygame.quit()
+    sys.exit()
