@@ -13,9 +13,8 @@ data = pd.read_csv('./training_set.csv')
 print(data.head())
 
 # Separate the features and the target variables
-num_target_vars = 2
-X = data.iloc[:, :-num_target_vars]
-y = data.iloc[:, -num_target_vars:]
+X = data.iloc[:, :-TARGET_COUNT]
+y = data.iloc[:, -TARGET_COUNT:]
 
 # Perform PCA on the features
 pca = PCA(n_components=5)  # Choose the number of components you want to keep

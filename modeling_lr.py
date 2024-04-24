@@ -5,14 +5,14 @@ from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 import numpy as np
 import joblib
+from config import *
 
 # Load the transformed training data
 data = pd.read_csv('./training_set_pca.csv')
 print(data.head())
 # Separate the features and the target variables
-num_target_vars = 2
-X_pca = data.iloc[:, :-num_target_vars]
-y = data.iloc[:, -num_target_vars:]
+X_pca = data.iloc[:, :-TARGET_COUNT]
+y = data.iloc[:, -TARGET_COUNT:]
 
 # Load the PCA model
 pca = joblib.load('pca_model.pkl')
