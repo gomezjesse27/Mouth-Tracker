@@ -24,6 +24,8 @@ if obj.type == 'MESH':
 
     #### Print out each shape keys' relative vertex positions ###########################################
     for key in obj.data.shape_keys.key_blocks:
+        if key.name == "basis": 
+            continue
         vertices_and_weights = []
         # Loop through each vertex in the object's data
         for i in range(len(obj.data.vertices)):
@@ -52,7 +54,7 @@ if obj.type == 'MESH':
         positions = [(round(vw[0].co.x, 3), round(vw[0].co.z, 3)) for vw in vertices_and_weights]
         #print(f"points_{key.name} = {positions}")
         # Find the difference between it and the basis
-        difference = [(a[0]-b[0], a[1]-b[1]) for a, b in zip(basis_positions, positions)]
+        difference = [(a[0]-b[0], a[1]-b[1]) for a, b in zip(positions, basis_positions)]
         difference_rounded = [(round(x[0], 3), round(x[1], 3)) for x in difference]
         print(f"relative_points_{key.name} = {difference_rounded}")
 else:
