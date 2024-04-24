@@ -35,7 +35,7 @@ DRAW_WIDTH, DRAW_HEIGHT = 256, 256
 
 def draw_emoji(x_pos, y_pos, size, morph_values):
     # Make morph_values have 4 values. If it has less, fill the rest with 0
-    morph_values = morph_values + [0] * (len(TARGET_NAMES) - len(morph_values))
+    morph_values = list(morph_values) + [0] * (len(TARGET_NAMES) - len(morph_values))
     smile_amount = morph_values[0]
     open_mouth_amount = morph_values[1]
     puff_amount = morph_values[2]

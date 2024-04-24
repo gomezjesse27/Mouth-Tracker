@@ -4,6 +4,7 @@ import numpy as np
 import joblib
 import warnings 
 from config import *
+from emoji_drawing import draw_emoji
 
 pca_model = joblib.load('pca_model.pkl')
 lr_model = joblib.load('lr_model.pkl') # Multi output linear regression
@@ -67,6 +68,7 @@ def main():
             pygame.draw.rect(screen, (200, 0, 255), (350, 10 + 20 * i, int(200 * predicted_target_values[i]), 30))
             target_text = font.render(f'{TARGET_NAMES[i]}: {round(predicted_target_values[i], 3)}', True, (255, 255, 255))
             screen.blit(target_text, (350, 10 + 20 * i))
+        draw_emoji(500, 200, 256, predicted_target_values)
 
         pygame.display.flip()
 
