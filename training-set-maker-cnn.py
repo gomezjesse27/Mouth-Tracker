@@ -2,6 +2,7 @@ import cv2
 import pygame
 import numpy as np
 import csv
+from config import *
 
 # Global resolution setting
 downsized_dimension = 64  # Adjust resolution here as needed
@@ -20,7 +21,7 @@ def save_datapoint(frame, mouth_open, smiling):
         writer.writerow(datapoint)
 
 def main():
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(WEBCAM_ID)
     pygame.init()
     screen = pygame.display.set_mode((800, 600))
     font = pygame.font.Font(None, 36)
@@ -30,7 +31,7 @@ def main():
     with open(training_set_name, 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(header)
-
+    cal = False
     running = True
     while running:
         ret, frame = cap.read()
@@ -51,7 +52,11 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                save_datapoint(training_frame, mouth_open, smiling)
+                cal = True
+            elif event.type == pygame.MOUSEBUTTONUP:
+                cal = False
+        if cal:
+            save_datapoint(training_frame, mouth_open, smiling)
     cap.release()
     cv2.destroyAllWindows()
     pygame.quit()

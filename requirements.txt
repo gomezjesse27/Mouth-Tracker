@@ -5,3 +5,4 @@ opencv_python==4.9.0.80
 pandas==2.2.2
 pygame==2.5.2
 scikit_learn==1.4.0
+tensorflow

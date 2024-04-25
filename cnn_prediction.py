@@ -2,6 +2,7 @@ import cv2
 import pygame
 import numpy as np
 from tensorflow.keras.models import load_model
+from config import *
 
 downsized_dimension = 64  # Adjust resolution here as needed, I have been going with 64 for the CNN model
 
@@ -14,7 +15,7 @@ def predict_target(frame):
     return predictions[0]
 
 def main():
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(WEBCAM_ID)
     pygame.init()
     screen = pygame.display.set_mode((800, 600))
     pygame.display.set_caption("The CNN Predictor")
