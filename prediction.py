@@ -5,6 +5,7 @@ import joblib
 import warnings 
 from config import *
 from emoji_drawing import draw_emoji
+from tensorflow.keras.models import load_model  # For cnn_model
 
 pca_model = None
 lr_model = None
@@ -20,20 +21,24 @@ def prediction_init():
         pca_model = joblib.load('pca_model.pkl')
         lr_model = joblib.load('lr_model.pkl')
     else:
-        cnn_model = joblib.load('cnn_model.h5')
+        cnn_model = load_model('cnn_model.h5')
 
 def predict_target(frame):
-    #print("Predicting!")
+    print("Predicting!")
     normalized_data_frame = frame / 255.0
-    datapoint = list(normalized_data_frame.flatten())
-    with warnings.catch_warnings(): # TODO: actually solve the warning. it's about X not having feature names even though it was trained with feature names (pix0 ... pix783)
+    datapoint = normalized_data_frame.flatten()
+
+    with warnings.catch_warnings():
         warnings.filterwarnings("ignore")
         if ALGORITHM == Algorithms.LINEAR_REGRESSION:
             transformed_datapoint = pca_model.transform([datapoint])
-            predictions = lr_model.predict(transformed_datapoint)[0] # idk why I have to put the [0] here but I do. then you can index predictions with [0] and [1] etc
+            predictions = lr_model.predict(transformed_datapoint)[0]
         else:
-            predictions = cnn_model.predict(normalized_data_frame)[0]
-    #print(f'Predicted target: {predictions[0]}, {predictions[1]}')
+            
+            reshaped_datapoint = datapoint.reshape(1, RESOLUTION, RESOLUTION, 1)  # Add batch dimension
+            print(f"Input shape to CNN: {reshaped_datapoint.shape}")  # Debugging
+            predictions = cnn_model.predict(reshaped_datapoint)[0]  # Predict
+    print(f'Predicted target values: {predictions}')
     return predictions
 
 def prediction_update(screen, events, cap):
@@ -44,7 +49,7 @@ def prediction_update(screen, events, cap):
                 running = False
             elif event.key == pygame.K_RETURN:
                 done = True
-    
+
     font = pygame.font.Font(None, 36)
     # Read the current frame from the webcam
     ret, frame = cap.read()
@@ -65,8 +70,9 @@ def prediction_update(screen, events, cap):
     # Draw the frame to the Pygame window
     screen.blit(pygame_frame, (0, 0))
 
-    # Render the target value as text and draw it to the Pygame window
-    for i in range(TARGET_COUNT):
+    # Adjust loop to avoid indexing errors
+    num_values = len(predicted_target_values)
+    for i in range(num_values):  # Only loop through the actual number of predictions
         pygame.draw.rect(screen, (200, 0, 255), (350, 10 + 20 * i, int(200 * predicted_target_values[i]), 30))
         target_text = font.render(f'{TARGET_NAMES[i]}: {round(predicted_target_values[i], 3)}', True, (255, 255, 255))
         screen.blit(target_text, (350, 10 + 20 * i))

@@ -1,32 +1,24 @@
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout, LeakyReLU, Input
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau, TensorBoard
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from sklearn.model_selection import train_test_split
-from config import RESOLUTION
-
-done = False
+from config import RESOLUTION, FEATURE_COLUMNS, LABEL_COLUMNS, BATCH_SIZE, ALGORITHM, Algorithms
 
 def modeling_cnn_init():
-    # these imports take a while so we do them here instead of at startup
-    from tensorflow.keras.models import Sequential
-    from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout, LeakyReLU, Input
-    from tensorflow.keras.optimizers import Adam
-    from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau, TensorBoard
-    from tensorflow.keras.preprocessing.image import ImageDataGenerator
-
+    # Import data
     global done
-    downsized_dimension = RESOLUTION  
-
-    # Load and preprocess data
     data = pd.read_csv('training_set.csv')
-    X = data.iloc[:, :-2].values.reshape(-1, downsized_dimension, downsized_dimension, 1)
-    y = data.iloc[:, -2:].values
-    X = X / 255.0  # Normalize pixel values
+    X = data.iloc[:, FEATURE_COLUMNS].values.reshape(-1, RESOLUTION, RESOLUTION, 1) / 255.0
+    y = data.iloc[:, LABEL_COLUMNS].values
 
     # Split data into training and validation sets
     X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.4, random_state=42)
 
-    # Image data augmentation for training
+    # Create data generators for training and validation
     train_datagen = ImageDataGenerator(
         rotation_range=10,
         width_shift_range=0.1,
@@ -35,15 +27,14 @@ def modeling_cnn_init():
         horizontal_flip=True,
         fill_mode='nearest'
     )
-    val_datagen = ImageDataGenerator()  # Validation data without augmentation
+    val_datagen = ImageDataGenerator()
 
-    # Create data generators
-    train_generator = train_datagen.flow(X_train, y_train, batch_size=64)
-    val_generator = val_datagen.flow(X_val, y_val, batch_size=64)
+    train_generator = train_datagen.flow(X_train, y_train, batch_size=BATCH_SIZE)
+    val_generator = val_datagen.flow(X_val, y_val, batch_size=BATCH_SIZE)
 
-    # Define CNN model structure
+    # Define the CNN model
     model = Sequential([
-        Input(shape=(downsized_dimension, downsized_dimension, 1)),
+        Input(shape=(RESOLUTION, RESOLUTION, 1)),
         Conv2D(32, (3, 3), padding='same'),
         LeakyReLU(negative_slope=0.1),
         MaxPooling2D((2, 2)),
@@ -59,33 +50,35 @@ def modeling_cnn_init():
         Dropout(0.5),
         Dense(128),
         LeakyReLU(negative_slope=0.1),
-        Dense(2, activation='sigmoid')
+        Dense(y.shape[1], activation='sigmoid')
     ])
 
-    # Compile the model with appropriate optimizer, loss, and metrics
-    model.compile(optimizer=Adam(learning_rate=0.00001), loss='mean_squared_error', metrics=['mean_squared_error'])
+    # Compile the model
+    model.compile(optimizer=Adam(learning_rate=0.0001), loss='mean_squared_error', metrics=['mean_squared_error'])
 
-    # Setup callbacks for model optimization
-    tensorboard_callback = TensorBoard(log_dir='./logs', histogram_freq=1, write_graph=True, write_images=True)
-    early_stopping = EarlyStopping(monitor='val_loss', patience=10, verbose=1, mode='min', restore_best_weights=True)
-    model_checkpoint = ModelCheckpoint('best_model.keras', save_best_only=True, verbose=1, mode='min')
-    reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=3, verbose=1, mode='min', min_lr=1e-6)
+    # Setup callbacks
+    callbacks = [
+        TensorBoard(log_dir='./logs', histogram_freq=1, write_graph=True, write_images=True),
+        EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True),
+        ModelCheckpoint('best_model.keras', save_best_only=True),
+        ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=3, min_lr=1e-6)
+    ]
 
     # Fit the model
     history = model.fit(
         train_generator,
-        steps_per_epoch=int(len(X_train) / 32),
+        steps_per_epoch=len(X_train) // BATCH_SIZE,
         validation_data=val_generator,
-        validation_steps=int(len(X_val) / 32),
+        validation_steps=len(X_val) // BATCH_SIZE,
         epochs=60,
-        callbacks=[tensorboard_callback, early_stopping, model_checkpoint, reduce_lr],
+        callbacks=callbacks,
         shuffle=True
     )
 
-    # Save the model
+    # Save the trained model
     model.save('cnn_model.h5')
-
-    # Plotting the training and validation loss and MSE
+    done = True
+    # Plot training and validation metrics
     plt.figure(figsize=(12, 5))
     plt.subplot(1, 2, 1)
     plt.plot(history.history['mean_squared_error'], label='Train MSE')
@@ -103,8 +96,9 @@ def modeling_cnn_init():
     plt.xlabel('Epoch')
     plt.legend(loc='upper right')
     plt.show()
-    done = True
+    
 
-def modeling_cnn_update(screen, events):
+def modeling_cnn_update(screen, events, cap):
     global done
+    
     return done
