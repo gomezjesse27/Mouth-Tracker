@@ -5,7 +5,7 @@ import numpy as np
 import random
 import csv
 import pygame_widgets
-from pygame_widgets.button import Button
+from pygame_widgets.button import ButtonArray
 from config import *
 from emoji_drawing import draw_emoji
 
@@ -128,25 +128,20 @@ def data_collection_update(screen, events, cap):
     #### DRAW ########################################################
     screen.fill((0, 0, 30))
     # Draw the camera image
-    screen.blit(pygame_frame, (0, 0))
+    screen.blit(pygame_frame, (350, 40))
 
     # Render the target value as text and draw it
     for i in range(TARGET_COUNT):
-        pygame.draw.rect(screen, (200, 0, 255), (350, 10 + 20 * i, int(200 * target_values[i]), 30))
+        pygame.draw.rect(screen, (200, 0, 255), (450, 360 + 20 * i, int(200 * target_values[i]), 30))
         target_text = font.render(f'{TARGET_NAMES[i]}: {round(target_values[i], 3)}', True, (255, 255, 255))
-        screen.blit(target_text, (350, 10 + 20 * i))
+        screen.blit(target_text, (450, 360 + 20 * i))
     
-    calButton = Button(screen, 800 - 130, 2, 130, 60,
-        text='Start Cal',
-        fontSize=30,
-        onClick=calButtonClick
-    )
-    doneButton = Button(screen, 800 - 130, 4 + 60, 130, 60,
-        text='Done',
-        fontSize=30,
-        onClick=doneButtonClick
+    buttonArray = ButtonArray(screen, 800 - 130, 2, 130, 60, (1, 2), border=2,
+        texts=('Start Cal' if not calibrating else 'Stop Cal', 'Done'),
+        onClicks=(calButtonClick, doneButtonClick),
     )
     
-    draw_emoji(400, 200, 256, target_values)
+    draw_emoji(16, 40, 256, target_values)
+
     pygame_widgets.update(events)  # Call once every loop to allow widgets to render and listen
     return done

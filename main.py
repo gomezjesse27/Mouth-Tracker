@@ -34,6 +34,18 @@ class ProgramState(Enum):
     MAX = 5
 state = ProgramState.DATA_COLLECTION
 
+def state_to_string(state):
+    match state:
+        case ProgramState.DATA_COLLECTION:
+            return "Data Collection"
+        case ProgramState.DATA_PREPROCESSING:
+            return "Data Preprocessing"
+        case ProgramState.MODELING:
+            return "Modeling"
+        case ProgramState.PREDICTION:
+            return "Prediction"
+    return "Unknown"
+
 def set_state(new_state):
     global state
     state = new_state
@@ -60,6 +72,7 @@ def main():
     pygame.display.set_caption('Calibration-based Mouth Tracking')
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     clock = pygame.time.Clock()
+    font = pygame.font.Font(None, 36)
     running = True
     set_state(ProgramState.DATA_COLLECTION)
     # Main loop ---------------------------------------------------------------
@@ -98,6 +111,8 @@ def main():
                 prediction_update(screen, events, cap)
                 pass
         # Between-frame stuff -----------------------
+        title_text = font.render(f'{state_to_string(state)}', True, (255, 255, 255))
+        screen.blit(title_text, (10, 10))
         pygame.display.flip()
         clock.tick(FPS_LIMIT)
     
