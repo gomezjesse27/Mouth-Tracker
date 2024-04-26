@@ -98,7 +98,6 @@ def main():
                 prediction_update(screen, events, cap)
                 pass
         # Between-frame stuff -----------------------
-        pygame_widgets.update(events)  # Call once every loop to allow widgets to render and listen
         pygame.display.flip()
         clock.tick(FPS_LIMIT)
     

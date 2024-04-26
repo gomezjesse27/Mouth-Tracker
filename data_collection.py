@@ -4,6 +4,8 @@ import pygame
 import numpy as np
 import random
 import csv
+import pygame_widgets
+from pygame_widgets.button import Button
 from config import *
 from emoji_drawing import draw_emoji
 
@@ -70,14 +72,29 @@ def two_target_calibration():
     normalized_mouse_position = (mouse_position[0] / screen_width, mouse_position[1] / screen_height)
     return normalized_mouse_position # use [0] and [1] as your two target values
 
-def data_collection_init():
-    global done
-    done = False
+def newCsv():
     # Start the CSV file with the header
     with open(training_set_name, 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(header)
-    
+
+def data_collection_init():
+    global done
+    done = False
+
+def doneButtonClick():
+    global done
+    done = True
+
+def calButtonClick():
+    global calibrating, calibration_start_time
+    if not calibrating:
+        calibrating = True
+        calibration_start_time = pygame.time.get_ticks()
+        newCsv()
+    else:
+        calibrating = False
+
 def data_collection_update(screen, events, cap):
     global calibrating, calibration_start_time, target_values, done
     # Read the current frame from the webcam
@@ -95,11 +112,7 @@ def data_collection_update(screen, events, cap):
     for event in events:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                if not calibrating:
-                    calibrating = True
-                    calibration_start_time = pygame.time.get_ticks()
-                else:
-                    calibrating = False
+                calButtonClick()
             elif event.key == pygame.K_BACKSPACE: # Backspace for "try again". Clears the training set.
                 clear_training_set()
             elif event.key == pygame.K_RETURN:
@@ -122,13 +135,18 @@ def data_collection_update(screen, events, cap):
         pygame.draw.rect(screen, (200, 0, 255), (350, 10 + 20 * i, int(200 * target_values[i]), 30))
         target_text = font.render(f'{TARGET_NAMES[i]}: {round(target_values[i], 3)}', True, (255, 255, 255))
         screen.blit(target_text, (350, 10 + 20 * i))
-    calibrating_text = font.render(f'PRESS SPACE TO START CALIBRATION', True, (0, 255, 255))
-    if not calibrating:
-        screen.blit(calibrating_text, (350, 470))
-    # print instructions
-    instructions = font.render("Press N to go to next script, Backspace to clear, ESC to abort", True, (255, 255, 255))
-    screen.blit(instructions, (0, 500))
+    
+    calButton = Button(screen, 800 - 130, 2, 130, 60,
+        text='Start Cal',
+        fontSize=30,
+        onClick=calButtonClick
+    )
+    doneButton = Button(screen, 800 - 130, 4 + 60, 130, 60,
+        text='Done',
+        fontSize=30,
+        onClick=doneButtonClick
+    )
     
     draw_emoji(400, 200, 256, target_values)
-
+    pygame_widgets.update(events)  # Call once every loop to allow widgets to render and listen
     return done
