@@ -34,6 +34,10 @@ class ProgramState(Enum):
     MAX = 5
 state = ProgramState.DATA_COLLECTION
 
+def update_webcam():
+    global cap
+    cap = cv2.VideoCapture(WEBCAM_ID)
+
 def state_to_string(state):
     match state:
         case ProgramState.DATA_COLLECTION:
@@ -83,7 +87,6 @@ def main():
                 running = False
 
         screen.fill((0, 50, 50))
-        
         # Update based on state ------------------------   
         match state:
             case ProgramState.DATA_COLLECTION:

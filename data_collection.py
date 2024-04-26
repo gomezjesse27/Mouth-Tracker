@@ -6,6 +6,7 @@ import random
 import csv
 import pygame_widgets
 from pygame_widgets.button import ButtonArray
+from pygame_widgets.slider import Slider
 from config import *
 from emoji_drawing import draw_emoji
 
@@ -95,6 +96,44 @@ def calButtonClick():
     else:
         calibrating = False
 
+def update_config(variable, increment):
+    global WEBCAM_ID, RESOLUTION, TARGET_COUNT
+    if variable == 'WEBCAM_ID':
+        WEBCAM_ID += increment
+        if WEBCAM_ID < 0:
+            WEBCAM_ID = 0
+    elif variable == 'RESOLUTION':
+        RESOLUTION += increment * 8
+        if RESOLUTION < 8:
+            RESOLUTION = 8
+        print(f'Resolution: {RESOLUTION}')
+    elif variable == 'TARGET_COUNT':
+        TARGET_COUNT += increment
+        if TARGET_COUNT < 1:
+            TARGET_COUNT = 1
+        elif TARGET_COUNT > len(TARGET_NAMES):
+            TARGET_COUNT = len(TARGET_NAMES)
+
+def get_config_var(variable):
+    if variable == 'WEBCAM_ID':
+        return WEBCAM_ID
+    elif variable == 'RESOLUTION':
+        return RESOLUTION
+    elif variable == 'TARGET_COUNT':
+        return TARGET_COUNT
+
+def make_config_control(screen, events, x, y, variable, update_func):
+    # Make - and + button
+    b = ButtonArray(screen, x, y, 60, 32, (2, 1), border=2,
+        texts=('-', '+'),
+        onClicks=(lambda: update_func(variable, -1), lambda: update_func(variable, 1)),
+    )
+    # Text above
+    font = pygame.font.Font(None, 16)
+    text = font.render(f"{variable}: {get_config_var(variable)}", True, (255, 255, 255))
+    screen.blit(text, (x, y - 15))
+    pygame_widgets.update(events)
+
 def data_collection_update(screen, events, cap):
     global calibrating, calibration_start_time, target_values, done
     # Read the current frame from the webcam
@@ -129,6 +168,8 @@ def data_collection_update(screen, events, cap):
     screen.fill((0, 0, 30))
     # Draw the camera image
     screen.blit(pygame_frame, (350, 40))
+    
+    draw_emoji(16, 40, 256, target_values)
 
     # Render the target value as text and draw it
     for i in range(TARGET_COUNT):
@@ -136,12 +177,17 @@ def data_collection_update(screen, events, cap):
         target_text = font.render(f'{TARGET_NAMES[i]}: {round(target_values[i], 3)}', True, (255, 255, 255))
         screen.blit(target_text, (450, 360 + 20 * i))
     
+    # Controls ----
     buttonArray = ButtonArray(screen, 800 - 130, 2, 130, 60, (1, 2), border=2,
         texts=('Start Cal' if not calibrating else 'Stop Cal', 'Done'),
         onClicks=(calButtonClick, doneButtonClick),
     )
-    
-    draw_emoji(16, 40, 256, target_values)
+    cfg_x, cfg_y = 0, 400
+    # Only the first one will even respond to clicks... idk why
+    make_config_control(screen, events, cfg_x, cfg_y, 'WEBCAM_ID', update_config)
+    make_config_control(screen, events, cfg_x, cfg_y + 50, 'RESOLUTION', update_config)
+    make_config_control(screen, events, cfg_x, cfg_y + 100, 'TARGET_COUNT', update_config)
+    make_config_control(screen, events, cfg_x, cfg_y + 150, 'ALGORITHM', update_config)
 
     pygame_widgets.update(events)  # Call once every loop to allow widgets to render and listen
     return done
