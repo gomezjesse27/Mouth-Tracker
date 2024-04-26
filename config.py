@@ -1,6 +1,12 @@
+from enum import Enum
+
+class Algorithms(Enum):
+    LINEAR_REGRESSION = 1
+    CNN = 2
+
 WEBCAM_ID = 1
 RESOLUTION = 24
-ALGORITHM = 'LINEAR_REGRESSION' # 'LINEAR_REGRESSION' or 'CNN'
+ALGORITHM = Algorithms.LINEAR_REGRESSION
 TARGET_COUNT = 3
 TARGET_NAMES = ['smile', 'mouth_open', 'puff', 'frown']
 

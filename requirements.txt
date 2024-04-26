@@ -6,3 +6,4 @@ pandas==2.2.2
 pygame==2.5.2
 scikit_learn==1.4.0
 tensorflow
+pygame_widgets
