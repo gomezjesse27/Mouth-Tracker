@@ -95,8 +95,11 @@ def data_collection_update(screen, events, cap):
     for event in events:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                calibrating = True
-                calibration_start_time = pygame.time.get_ticks()
+                if not calibrating:
+                    calibrating = True
+                    calibration_start_time = pygame.time.get_ticks()
+                else:
+                    calibrating = False
             elif event.key == pygame.K_BACKSPACE: # Backspace for "try again". Clears the training set.
                 clear_training_set()
             elif event.key == pygame.K_RETURN:

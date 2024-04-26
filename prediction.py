@@ -37,6 +37,7 @@ def predict_target(frame):
     return predictions
 
 def prediction_update(screen, events, cap):
+    global done
     for event in events:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
