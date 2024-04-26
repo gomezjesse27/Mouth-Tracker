@@ -15,6 +15,7 @@ from data_collection import data_collection_init, data_collection_update
 from data_preprocessing import data_preprocessing_update, data_preprocessing_init
 from modeling_lr import modeling_lr_init, modeling_lr_update
 from modeling_cnn import modeling_cnn_init, modeling_cnn_update
+from modeling_ann import modeling_ann_init, modeling_ann_update
 from prediction import prediction_init, prediction_update
 
 WINDOW_WIDTH, WINDOW_HEIGHT = 800, 600
@@ -64,8 +65,10 @@ def set_state(new_state):
             print("Modeling")
             if ALGORITHM == Algorithms.LINEAR_REGRESSION:
                 modeling_lr_init()
-            else:
+            elif ALGORITHM == Algorithms.CNN:
                 modeling_cnn_init()
+            elif ALGORITHM == Algorithms.ANN:
+                modeling_ann_init()
         case ProgramState.PREDICTION:
             print("Prediction")
             prediction_init()
@@ -94,8 +97,10 @@ def main():
                 if done:
                     if ALGORITHM == Algorithms.LINEAR_REGRESSION:
                         set_state(ProgramState.DATA_PREPROCESSING)
-                    else:
+                    elif ALGORITHM == Algorithms.CNN:
                         set_state(ProgramState.MODELING) # CNN doesnt use PCA
+                    elif ALGORITHM == Algorithms.ANN:
+                        set_state(ProgramState.DATA_PREPROCESSING)
             case ProgramState.DATA_PREPROCESSING:
                 done = data_preprocessing_update(screen, events)
                 if done:
@@ -105,8 +110,10 @@ def main():
                 done = False
                 if ALGORITHM == Algorithms.LINEAR_REGRESSION:
                     done = modeling_lr_update(screen, events)
-                else:
+                elif ALGORITHM == Algorithms.CNN:
                     done = modeling_cnn_update(screen, events, cap)
+                elif ALGORITHM == Algorithms.ANN:
+                    done = modeling_ann_update(screen, events)
                 pass
                 if done:
                     set_state(ProgramState.PREDICTION)
@@ -114,8 +121,12 @@ def main():
                 prediction_update(screen, events, cap)
                 pass
         # Between-frame stuff -----------------------
+        # show current state
         title_text = font.render(f'{state_to_string(state)}', True, (255, 255, 255))
         screen.blit(title_text, (10, 10))
+        # show what algorithm is being used
+        algorithm_text = font.render(f'Algorithm: {ALGORITHM}', True, (255, 255, 255))
+        screen.blit(algorithm_text, (400, 560))
         pygame.display.flip()
         clock.tick(FPS_LIMIT)
     

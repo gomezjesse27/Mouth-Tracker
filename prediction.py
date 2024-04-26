@@ -10,18 +10,22 @@ from tensorflow.keras.models import load_model  # For cnn_model
 pca_model = None
 lr_model = None
 cnn_model = None
+ann_model = None
 predicted_target_values = []
 done = False
 
 def prediction_init():
-    global pca_model, lr_model, cnn_model, predicted_target_values, done
+    global pca_model, lr_model, cnn_model, ann_model, predicted_target_values, done
     done = False
     predicted_target_values = [0 for _ in range(TARGET_COUNT)]
     if ALGORITHM == Algorithms.LINEAR_REGRESSION:
         pca_model = joblib.load('pca_model.pkl')
         lr_model = joblib.load('lr_model.pkl')
-    else:
+    elif ALGORITHM == Algorithms.CNN:
         cnn_model = load_model('cnn_model.h5')
+    else:
+        pca_model = joblib.load('pca_model.pkl')
+        ann_model = load_model('ann_model.h5')
 
 def predict_target(frame):
     print("Predicting!")
@@ -33,11 +37,13 @@ def predict_target(frame):
         if ALGORITHM == Algorithms.LINEAR_REGRESSION:
             transformed_datapoint = pca_model.transform([datapoint])
             predictions = lr_model.predict(transformed_datapoint)[0]
-        else:
-            
+        elif ALGORITHM == Algorithms.CNN:
             reshaped_datapoint = datapoint.reshape(1, RESOLUTION, RESOLUTION, 1)  # Add batch dimension
             print(f"Input shape to CNN: {reshaped_datapoint.shape}")  # Debugging
             predictions = cnn_model.predict(reshaped_datapoint)[0]  # Predict
+        else:
+            transformed_datapoint = pca_model.transform([datapoint])
+            predictions = ann_model.predict(transformed_datapoint)[0]
     print(f'Predicted target values: {predictions}')
     return predictions
 
@@ -77,4 +83,5 @@ def prediction_update(screen, events, cap):
         target_text = font.render(f'{TARGET_NAMES[i]}: {round(predicted_target_values[i], 3)}', True, (255, 255, 255))
         screen.blit(target_text, (350, 10 + 20 * i))
     draw_emoji(500, 200, 256, predicted_target_values)
+
     return done

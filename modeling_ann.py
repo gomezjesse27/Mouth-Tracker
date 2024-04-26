@@ -6,14 +6,16 @@ from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 import numpy as np
 import joblib
+from keras.models import Sequential
+from keras.layers import Dense
 from sklearn.model_selection import train_test_split
 from config import *
 
 done = False
 
-def modeling_lr_init():
+def modeling_ann_init():
     global done
-    
+    done = False
     # Load the transformed training data
     data = pd.read_csv('./training_set_pca.csv')
     train_data, test_data = train_test_split(data, test_size=0.2, random_state=42)
@@ -22,25 +24,23 @@ def modeling_lr_init():
     # Separate the features and the target variables
     X_pca = train_data.iloc[:, :-TARGET_COUNT]
     y = train_data.iloc[:, -TARGET_COUNT:]
-    
-    # Train a linear regression model to predict the multiple outputs
-    regression_model = MultiOutputRegressor(LinearRegression()).fit(X_pca, y)
-    # Save the model to disk
-    joblib.dump(regression_model, 'lr_model.pkl')
 
-    ### testing ###########
-    # Separate the features and the target variables from the test data
-    X_test_pca = test_data.iloc[:, :-TARGET_COUNT]
-    y_test = test_data.iloc[:, -TARGET_COUNT:]
+    # number of input and outputs respectively
+    n_features = X_pca.shape[1]
+    n_targets = y.shape[1]
 
-    # Use the trained model to make predictions on the test data
-    y_pred = regression_model.predict(X_test_pca)
+    model = Sequential()
+    model.add(Dense(4, input_dim=n_features, activation='relu'))
+    model.add(Dense(n_targets, activation='linear')) # Output layer
 
-    # Evaluate the performance of the model
-    mse = mean_squared_error(y_test, y_pred)
-    print(f'Mean Squared Error on test data: {mse}')
+    # Compile
+    model.compile(loss='mean_squared_error', optimizer='adam')
+    # Train
+    model.fit(X_pca, y, epochs=50, batch_size=10)
+    # Save
+    model.save('ann_model.h5')
     done = True
 
-def modeling_lr_update(screen, events):
+def modeling_ann_update(screen, events):
     global done
     return done

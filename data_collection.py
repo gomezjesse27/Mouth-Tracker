@@ -15,14 +15,25 @@ header = [f'pix{i}' for i in range(RESOLUTION * RESOLUTION)] + TARGET_NAMES[:TAR
 done = False
 
 # The face will morph according to these keyframes when calibration starts
+# cal_keyframes = [
+#     # (seconds, [smile, mouth_open, puff, frown])
+#     (0, [0, 0, 0]),
+#     (2, [1, 0, 0]),
+#     (4, [1, 1, 0]),
+#     (6, [0, 0, 0]),
+#     (8, [0, 0, 1]),
+#     (10, [0, 0, 0]),
+#     ]  # For calibration
 cal_keyframes = [
     # (seconds, [smile, mouth_open, puff, frown])
     (0, [0, 0, 0]),
     (2, [1, 0, 0]),
     (4, [1, 1, 0]),
     (6, [0, 0, 0]),
-    (8, [0, 0, 1]),
+    (8, [0, 1, 0]),
     (10, [0, 0, 0]),
+    (12, [0, 0, 1]),
+    (14, [0, 0, 0]),
     ]  # For calibration
 # The time of the latest keyframe
 cal_length = cal_keyframes[-1][0]
