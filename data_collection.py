@@ -24,16 +24,17 @@ done = False
 #     (8, [0, 0, 1]),
 #     (10, [0, 0, 0]),
 #     ]  # For calibration
+cal_keyframe_timescale = 2 # seconds between keyframes
 cal_keyframes = [
-    # (seconds, [smile, mouth_open, puff, frown])
-    (0, [0, 0, 0]),
-    (2, [1, 0, 0]),
-    (4, [1, 1, 0]),
-    (6, [0, 0, 0]),
-    (8, [0, 1, 0]),
-    (10, [0, 0, 0]),
-    (12, [0, 0, 1]),
-    (14, [0, 0, 0]),
+    # (seconds (generated lol), [smile, mouth_open, puff, frown])
+    [0, [0, 0, 0]],
+    [2, [1, 0, 0]],
+    [4, [1, 1, 0]],
+    [6, [0, 0, 0]],
+    [8, [0, 1, 0]],
+    [10, [0, 0, 0]],
+    [12, [0, 0, 1]],
+    [14, [0, 0, 0]],
     ]  # For calibration
 # The time of the latest keyframe
 cal_length = cal_keyframes[-1][0]
@@ -42,6 +43,7 @@ target_values = [0 for _ in range(TARGET_COUNT)]
 calibrating = False
 calibration_start_time = 0
 font = pygame.font.Font(None, 36)
+
 
 def get_interpolated_values(time):
     # Find the two keyframes
@@ -106,6 +108,7 @@ def calButtonClick():
         newCsv()
     else:
         calibrating = False
+    print(cal_keyframes)
 
 def update_config(variable, increment):
     global WEBCAM_ID, RESOLUTION, TARGET_COUNT

@@ -16,8 +16,9 @@ from data_preprocessing import data_preprocessing_update, data_preprocessing_ini
 from modeling_lr import modeling_lr_init, modeling_lr_update
 from modeling_cnn import modeling_cnn_init, modeling_cnn_update
 from modeling_ann import modeling_ann_init, modeling_ann_update
+from modeling_ann_nopca import modeling_ann_nopca_init, modeling_ann_nopca_update
 from prediction import prediction_init, prediction_update
-
+from prediction_all import prediction_all_init, prediction_all_update
 
 WINDOW_WIDTH, WINDOW_HEIGHT = 800, 600
 FPS_LIMIT = 30
@@ -70,9 +71,19 @@ def set_state(new_state):
                 modeling_cnn_init()
             elif ALGORITHM == Algorithms.ANN:
                 modeling_ann_init()
+            elif ALGORITHM == Algorithms.ANN_NOPCA:
+                modeling_ann_nopca_init()
+            elif ALGORITHM == Algorithms.ALL:
+                modeling_lr_init()
+                modeling_cnn_init()
+                modeling_ann_init()
+                modeling_ann_nopca_init()
         case ProgramState.PREDICTION:
             print("Prediction")
-            prediction_init()
+            if ALGORITHM == Algorithms.ALL:
+                prediction_all_init()
+            else:
+                prediction_init()
 
 def main():
     # Graphical setup ----------------------------------------------------
@@ -89,6 +100,10 @@ def main():
         for event in events:
             if event.type == pygame.QUIT:
                 running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_4:
+                    # skip to prediction
+                    set_state(ProgramState.PREDICTION)
 
         screen.fill((0, 50, 50))
         # Update based on state ------------------------   
@@ -101,6 +116,10 @@ def main():
                     elif ALGORITHM == Algorithms.CNN:
                         set_state(ProgramState.MODELING) # CNN doesnt use PCA
                     elif ALGORITHM == Algorithms.ANN:
+                        set_state(ProgramState.DATA_PREPROCESSING)
+                    elif ALGORITHM == Algorithms.ANN_NOPCA:
+                        set_state(ProgramState.MODELING)
+                    elif ALGORITHM == Algorithms.ALL:
                         set_state(ProgramState.DATA_PREPROCESSING)
             case ProgramState.DATA_PREPROCESSING:
                 done = data_preprocessing_update(screen, events)
@@ -115,18 +134,26 @@ def main():
                     done = modeling_cnn_update(screen, events, cap)
                 elif ALGORITHM == Algorithms.ANN:
                     done = modeling_ann_update(screen, events)
-                pass
+                elif ALGORITHM == Algorithms.ANN_NOPCA:
+                    done = modeling_ann_nopca_update(screen, events)
+                elif ALGORITHM == Algorithms.ALL: # haters gonna hate
+                    done = modeling_lr_update(screen, events) and modeling_cnn_update(screen, events, cap) and modeling_ann_update(screen, events) and modeling_ann_nopca_update(screen, events)
                 if done:
                     set_state(ProgramState.PREDICTION)
             case ProgramState.PREDICTION:
-                prediction_update(screen, events, cap)
+                if ALGORITHM == Algorithms.ALL:
+                    done = prediction_all_update(screen, events, cap)
+                else:
+                    done = prediction_update(screen, events, cap)
+                if done:
+                    set_state(ProgramState.DATA_COLLECTION) # Loop back around
                 pass
         # Between-frame stuff -----------------------
         # show current state
         title_text = font.render(f'{state_to_string(state)}', True, (255, 255, 255))
         screen.blit(title_text, (10, 10))
         # show what algorithm is being used
-        algorithm_text = font.render(f'Algorithm: {ALGORITHM}', True, (255, 255, 255))
+        algorithm_text = font.render(f'Algorithm: {algo_to_string(ALGORITHM)}', True, (255, 255, 255))
         screen.blit(algorithm_text, (400, 560))
         pygame.display.flip()
         clock.tick(FPS_LIMIT)

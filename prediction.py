@@ -11,11 +11,12 @@ pca_model = None
 lr_model = None
 cnn_model = None
 ann_model = None
+ann_nopca_model = None
 predicted_target_values = []
 done = False
 
 def prediction_init():
-    global pca_model, lr_model, cnn_model, ann_model, predicted_target_values, done
+    global pca_model, lr_model, cnn_model, ann_model, predicted_target_values, ann_nopca_model, done
     done = False
     predicted_target_values = [0 for _ in range(TARGET_COUNT)]
     if ALGORITHM == Algorithms.LINEAR_REGRESSION:
@@ -23,9 +24,11 @@ def prediction_init():
         lr_model = joblib.load('lr_model.pkl')
     elif ALGORITHM == Algorithms.CNN:
         cnn_model = load_model('cnn_model.h5')
-    else:
+    elif ALGORITHM == Algorithms.ANN:
         pca_model = joblib.load('pca_model.pkl')
         ann_model = load_model('ann_model.h5')
+    elif ALGORITHM == Algorithms.ANN_NOPCA:
+        ann_nopca_model = load_model('ann_nopca_model.h5')
 
 def predict_target(frame):
     print("Predicting!")
@@ -41,9 +44,12 @@ def predict_target(frame):
             reshaped_datapoint = datapoint.reshape(1, RESOLUTION, RESOLUTION, 1)  # Add batch dimension
             print(f"Input shape to CNN: {reshaped_datapoint.shape}")  # Debugging
             predictions = cnn_model.predict(reshaped_datapoint)[0]  # Predict
-        else:
+        elif ALGORITHM == Algorithms.ANN:
             transformed_datapoint = pca_model.transform([datapoint])
             predictions = ann_model.predict(transformed_datapoint)[0]
+        elif ALGORITHM == Algorithms.ANN_NOPCA:
+            reshaped_datapoint = datapoint = datapoint.reshape(1, -1)
+            predictions = ann_nopca_model.predict(reshaped_datapoint)[0]
     print(f'Predicted target values: {predictions}')
     return predictions
 
