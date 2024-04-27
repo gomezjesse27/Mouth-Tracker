@@ -40,14 +40,14 @@ def modeling_cnn_init():
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     # Define the CNN model architecture
-    
+    #works best with 1 conv layer
+    # 64 resolution and batch size fo 64
     model = Sequential([
         Conv2D(32, (3, 3), activation='relu', input_shape=(RESOLUTION, RESOLUTION, 1)),
         MaxPooling2D(2, 2),# Max pooling layer
-        Conv2D(64, (3, 3), activation='relu'), #2 convolutional layers 
-        MaxPooling2D(2, 2),
+        #Conv2D(64, (3, 3), activation='relu', input_shape=(RESOLUTION, RESOLUTION, 1)),
+        #MaxPooling2D(2, 2),# Max pooling layer
         Flatten(),# flatten the 3D output to 1D
-        Dense(128, activation='relu'), # 1 dense layer
         Dropout(0.5),
         Dense(num_classes, activation='softmax')  # number of classes here
         #softmax activation function instead of sigmoid
