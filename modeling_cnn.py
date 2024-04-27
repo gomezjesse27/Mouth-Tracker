@@ -5,6 +5,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
 from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
 from config import *
 
 def modeling_cnn_init():
@@ -41,10 +42,9 @@ def modeling_cnn_init():
 
     # Define the CNN model architecture
     #works best with 1 conv layer
-    # 64 resolution and batch size fo 64
     model = Sequential([
         Conv2D(32, (3, 3), activation='relu', input_shape=(RESOLUTION, RESOLUTION, 1)),
-        MaxPooling2D(2, 2),# Max pooling layer
+        #MaxPooling2D(2, 2),# Max pooling layer
         #Conv2D(64, (3, 3), activation='relu', input_shape=(RESOLUTION, RESOLUTION, 1)),
         #MaxPooling2D(2, 2),# Max pooling layer
         Flatten(),# flatten the 3D output to 1D
@@ -57,10 +57,27 @@ def modeling_cnn_init():
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
     # Train the model
-    model.fit(X_train, y_train, epochs=15, batch_size=64, validation_data=(X_test, y_test))
+    history = model.fit(X_train, y_train, epochs=18, batch_size=40, validation_data=(X_test, y_test))
 
     # Save the model to disk
     model.save('cnn_model.h5')
+    # Plot training & validation accuracy values
+    plt.plot(history.history['accuracy'])
+    plt.plot(history.history['val_accuracy'])
+    plt.title('Model accuracy')
+    plt.ylabel('Accuracy')
+    plt.xlabel('Epoch')
+    plt.legend(['Train', 'Test'], loc='upper left')
+    plt.show()
+
+    # Plot training & validation loss values
+    plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
+    plt.title('Model loss')
+    plt.ylabel('Loss')
+    plt.xlabel('Epoch')
+    plt.legend(['Train', 'Test'], loc='upper left')
+    plt.show()
 
     print("Model trained and saved successfully.")
     done = True
