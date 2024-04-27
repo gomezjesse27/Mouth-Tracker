@@ -3,6 +3,7 @@ from enum import Enum
 class Algorithms(Enum):
     LINEAR_REGRESSION = 1
     CNN = 2
+    ANN = 3
 
 WEBCAM_ID = 0
 RESOLUTION = 64

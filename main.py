@@ -18,6 +18,7 @@ from modeling_cnn import modeling_cnn_init, modeling_cnn_update
 from modeling_ann import modeling_ann_init, modeling_ann_update
 from prediction import prediction_init, prediction_update
 
+
 WINDOW_WIDTH, WINDOW_HEIGHT = 800, 600
 FPS_LIMIT = 30
 
