@@ -12,6 +12,8 @@ RESOLUTION = 32
 ALGORITHM = Algorithms.ALL
 TARGET_COUNT = 3
 TARGET_NAMES = ['smile', 'mouth_open', 'puff', 'frown']
+TARGET_COUNT = 6
+TARGET_NAMES = ['smile', 'mouth_open', 'puff', 'frown', 'left', 'right']
 FEATURE_COUNT = RESOLUTION * RESOLUTION  
 BATCH_SIZE = 32  # Batch size for model training
 
