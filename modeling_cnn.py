@@ -57,7 +57,7 @@ def modeling_cnn_init():
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
     # Train the model
-    history = model.fit(X_train, y_train, epochs=18, batch_size=40, validation_data=(X_test, y_test))
+    history = model.fit(X_train, y_train, epochs=18, batch_size=42, validation_data=(X_test, y_test))
 
     # Save the model to disk
     model.save('cnn_model.h5')
