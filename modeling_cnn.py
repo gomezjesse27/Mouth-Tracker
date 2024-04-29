@@ -44,7 +44,7 @@ def modeling_cnn_init():
     # Define the CNN model architecture
     #works best with 1 conv layer
     model = Sequential([
-        Conv2D(42, (1, 1), activation='relu', input_shape=(RESOLUTION, RESOLUTION, 1)),
+        Conv2D(32, (3, 3), activation='relu', input_shape=(RESOLUTION, RESOLUTION, 1)),
         #MaxPooling2D(2, 2),# Max pooling layer
         #Conv2D(64, (3, 3), activation='relu', input_shape=(RESOLUTION, RESOLUTION, 1)),
         #MaxPooling2D(2, 2),# Max pooling layer
@@ -58,7 +58,7 @@ def modeling_cnn_init():
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
     # Train the model
-    history = model.fit(X_train, y_train, epochs=50, batch_size=40, validation_data=(X_test, y_test))
+    history = model.fit(X_train, y_train, epochs=30, batch_size=40, validation_data=(X_test, y_test))
 
     # Save the model to disk
     model.save('cnn_model.h5')
