@@ -46,6 +46,18 @@ def predict_target(frame):
         predictions[Algorithms.ANN_NOPCA] = ann_nopca_model.predict(reshaped_datapoint)[0]
     return predictions
 
+
+
+def get_average_predictions(predictions):
+    # Calculate the average prediction across all models
+    num_models = len(predictions)
+    num_targets = len(predictions[0])
+    average_prediction = [sum(predictions[j][i] for j in range(num_models)) / num_models for i in range(num_targets)]
+    return average_prediction
+
+
+
+
 def prediction_all_update(screen, events, cap):
     global done
     for event in events:
@@ -70,6 +82,9 @@ def prediction_all_update(screen, events, cap):
 
     predicted_target_values = predict_target(datapoint_frame)
 
+    
+    average_prediction = get_average_predictions(predicted_target_values)
+
     #### DRAW ########################################################
     screen.fill((50, 10, 0))
     # Draw the frame to the Pygame window
@@ -87,5 +102,10 @@ def prediction_all_update(screen, events, cap):
         # Write what algo it is
         algo_text = font.render(f'{algo_to_string(i)}', True, (255, 255, 255))
         screen.blit(algo_text, (500, i * 150 + 40))
+
+    # Draw the average prediction
+    draw_emoji(80, 400, 128, average_prediction)
+    average_text = font.render('Average Prediction', True, (255, 255, 255))
+    screen.blit(average_text, (50, 550))
 
     return done
