@@ -26,15 +26,20 @@ done = False
 #     ]  # For calibration
 cal_keyframe_timescale = 2 # seconds between keyframes
 cal_keyframes = [
-    # (seconds (generated lol), [smile, mouth_open, puff, frown])
-    [0, [0, 0, 0]],
-    [2, [1, 0, 0]],
-    [4, [1, 1, 0]],
-    [6, [0, 0, 0]],
-    [8, [0, 1, 0]],
-    [10, [0, 0, 0]],
-    [12, [0, 0, 1]],
-    [14, [0, 0, 0]],
+    # seconds, [smile, mouth_open, puff, frown, left, right])
+    [0,  [0, 0, 0, 0, 0, 0]],
+    [2,  [1, 0, 0, 0, 0, 0]],
+    [4,  [1, 1, 0, 0, 0, 0]],
+    [6,  [0, 0, 0, 0, 0, 0]],
+    [8,  [0, 1, 0, 0, 0, 0]],
+    [10, [0, 0, 0, 0, 0, 0]],
+    [12, [0, 0, 1, 0, 0, 0]],
+    [14, [0, 0, 0, 0, 0, 0]],
+    [16, [0, 0, 0, 1, 0, 0]],
+    [18, [0, 0, 0, 0, 0, 0]],
+    [20, [0, 0, 0, 0, 1, 0]],
+    [22, [0, 0, 0, 0, 0, 0]],
+    [24, [0, 0, 0, 0, 0, 1]],
     ]  # For calibration
 # The time of the latest keyframe
 cal_length = cal_keyframes[-1][0]
