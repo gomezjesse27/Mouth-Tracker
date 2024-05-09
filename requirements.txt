@@ -7,3 +7,5 @@ pygame==2.5.2
 scikit_learn==1.4.0
 tensorflow
 pygame_widgets
+plotly
+nbformat
