@@ -30,7 +30,7 @@ def modeling_ann_nopca_init():
     n_targets = y.shape[1]
 
     model = Sequential()
-    model.add(Dense(FEATURE_COUNT//2, input_dim=n_features, activation='relu'))
+    model.add(Dense(FEATURE_COUNT//8, input_dim=n_features, activation='relu'))
     model.add(Dense(n_targets, activation='linear')) # Output layer
 
     # Compile

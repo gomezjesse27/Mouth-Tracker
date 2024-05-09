@@ -30,7 +30,7 @@ def modeling_ann_init():
     n_targets = y.shape[1]
 
     model = Sequential()
-    model.add(Dense(4, input_dim=n_features, activation='relu'))
+    model.add(Dense(20, input_dim=n_features, activation='relu'))
     model.add(Dense(n_targets, activation='linear')) # Output layer
 
     # Compile

@@ -34,9 +34,6 @@ def modeling_cnn_init():
     # Reshape X to fit the model's input requirements: (num_samples, RESOLUTION, RESOLUTION, 1)
     X = X.reshape(-1, RESOLUTION, RESOLUTION, 1)
 
-    # Normalize the pixel values
-    X = X.astype('float32') / 255.0
-
     # Split the data
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
