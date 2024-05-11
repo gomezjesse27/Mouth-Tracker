@@ -7,9 +7,9 @@ class Algorithms(IntEnum):
     ANN_NOPCA = 3
     ALL = 4
 
-WEBCAM_ID = 0
+WEBCAM_ID = 3
 RESOLUTION = 32
-ALGORITHM = Algorithms.ALL
+ALGORITHM = Algorithms.LINEAR_REGRESSION
 TARGET_COUNT = 3
 TARGET_NAMES = ['smile', 'mouth_open', 'puff', 'frown']
 TARGET_COUNT = 6

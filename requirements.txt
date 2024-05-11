@@ -9,3 +9,4 @@ tensorflow
 pygame_widgets
 plotly
 nbformat
+python-osc

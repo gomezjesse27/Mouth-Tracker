@@ -5,7 +5,9 @@ import joblib
 import warnings 
 from config import *
 from emoji_drawing import draw_emoji
-from tensorflow.keras.models import load_model  # For cnn_model
+from tensorflow.keras.models import load_model
+
+from osc import predictions_to_osc  # For cnn_model
 
 pca_model = None
 lr_model = None
@@ -31,7 +33,7 @@ def prediction_init():
         ann_nopca_model = load_model('ann_nopca_model.h5')
 
 def predict_target(frame):
-    print("Predicting!")
+    #print("Predicting!")
     normalized_data_frame = frame / 255.0
     datapoint = normalized_data_frame.flatten()
 
@@ -42,7 +44,7 @@ def predict_target(frame):
             predictions = lr_model.predict(transformed_datapoint)[0]
         elif ALGORITHM == Algorithms.CNN:
             reshaped_datapoint = datapoint.reshape(1, RESOLUTION, RESOLUTION, 1)  # Add batch dimension
-            print(f"Input shape to CNN: {reshaped_datapoint.shape}")  # Debugging
+            #print(f"Input shape to CNN: {reshaped_datapoint.shape}")  # Debugging
             predictions = cnn_model.predict(reshaped_datapoint)[0]  # Predict
         elif ALGORITHM == Algorithms.ANN:
             transformed_datapoint = pca_model.transform([datapoint])
@@ -50,7 +52,7 @@ def predict_target(frame):
         elif ALGORITHM == Algorithms.ANN_NOPCA:
             reshaped_datapoint = datapoint = datapoint.reshape(1, -1)
             predictions = ann_nopca_model.predict(reshaped_datapoint)[0]
-    print(f'Predicted target values: {predictions}')
+    #print(f'Predicted target values: {predictions}')
     return predictions
 
 def prediction_update(screen, events, cap):
@@ -89,5 +91,6 @@ def prediction_update(screen, events, cap):
         target_text = font.render(f'{TARGET_NAMES[i]}: {round(predicted_target_values[i], 3)}', True, (255, 255, 255))
         screen.blit(target_text, (350, 10 + 20 * i))
     draw_emoji(500, 200, 256, predicted_target_values)
+    predictions_to_osc(predicted_target_values)
 
     return done
