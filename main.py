@@ -157,6 +157,7 @@ def main():
         screen.blit(algorithm_text, (400, 560))
         pygame.display.flip()
         clock.tick(FPS_LIMIT)
+        #Going to add some stuff heres
     
     pygame.quit()
 
